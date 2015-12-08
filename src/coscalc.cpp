@@ -1,6 +1,6 @@
-#include "coscalc.hpp"
-#include "adapt_trapezoid.hpp"
 #include <cmath>
+#include <adapt_trapezoid.hpp>
+#include <coscalc.hpp>
 
 //using namespace std;
 
