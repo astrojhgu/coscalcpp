@@ -5,6 +5,8 @@
 #include <cassert>
 #include <iostream>
 #include <functional>
+#include <cmath>
+#include <algorithm>
 //#include <iostream>
 
 //using namespace std;
@@ -99,10 +101,14 @@ auto adapt_trapezoid(fT fun,
     }
  bk:
   resT result=0;
-  for(typename std::list<interval>::iterator i=interval_list.begin();i!=interval_list.end();i++)
-    {
-      result+=i->second;
+  
+  interval_list.sort([](const interval& x1,const interval& x2){
+      return std::abs(x1.second)<std::abs(x2.second);
     }
+    );
+
+  result=std::accumulate(interval_list.begin(),interval_list.end(),interval(0,0,false),[](const interval& x1,const interval& x2){return interval(0,x1.second+x2.second,false);}).second;
+  
   return result;
 }
 

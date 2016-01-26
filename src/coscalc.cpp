@@ -9,9 +9,12 @@ namespace coscalc
   cosmic_param::cosmic_param(double _c,double _H0,
 			     double _Omega_m,
 			     double _Omega_l,
-			     double _Omega_k)
+			     double _Omega_k,
+			     double _Omega_rad,
+			     double _w)
     :c(_c),H0(_H0),Omega_m(_Omega_m),
-     Omega_l(_Omega_l),Omega_k(_Omega_k)
+     Omega_l(_Omega_l),Omega_k(_Omega_k),
+     Omega_rad(_Omega_rad),w(_w)
   {
   }
 
@@ -21,9 +24,10 @@ namespace coscalc
   {}
 
   
-  double cosmic_calculator::E(double z,double Omega_m,double Omega_l,double Omega_k)const
+  double cosmic_calculator::E(double z,double Omega_m,double Omega_l,double Omega_k,double Omega_rad,double w)const
   {
-    return std::sqrt(Omega_m*(1+z)*(1+z)*(1+z)+Omega_k*(1+z)*(1+z)+Omega_l);
+    double zp1=1+z;
+    return std::sqrt(Omega_rad*zp1*zp1*zp1*zp1+Omega_m*zp1*zp1*zp1+Omega_k*zp1*zp1+Omega_l*pow(zp1,3*(1+w)));
   }
   
   double cosmic_calculator::calc_dc(double z)const
@@ -31,10 +35,12 @@ namespace coscalc
     double Omega_m= this->cp.Omega_m;
     double Omega_l= this->cp.Omega_l;
     double Omega_k= this->cp.Omega_k;
+    double Omega_rad=this->cp.Omega_rad;
+    double w=this->cp.w;
     double c      = this->cp.c;
     double H0     = this->cp.H0;
 
-    return c/H0*adapt_trapezoid([=](double z){return 1.0/E(z,Omega_m,Omega_l,Omega_k);},0.,z,1e-4);
+    return c/H0*adapt_trapezoid([=](double z){return 1.0/E(z,Omega_m,Omega_l,Omega_k,Omega_rad,w);},0.,z,1e-4);
   }
 
   double cosmic_calculator::calc_dm(double z)const

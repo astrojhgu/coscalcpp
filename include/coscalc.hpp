@@ -55,12 +55,16 @@ namespace coscalc
     const double Omega_m;
     const double Omega_l;
     const double Omega_k;
+    const double Omega_rad;
+    const double w;
 
   public:
     cosmic_param(double _c,double _H0,
 		 double _Omega_m,
 		 double _Omega_l,
-		 double _Omega_k);
+		 double _Omega_k,
+		 double _Omega_rad,
+		 double _w);
   };
 
   template <unit_system us>
@@ -68,7 +72,7 @@ namespace coscalc
   {
     using u=unit<us>;
     return cosmic_param(2.99792458E8*u::m/u::s,71*u::km/u::s/u::Mpc,
-			.27,.73,0.0);
+			.27,.73,0.0,0,-1);
   }
 
   class cosmic_calculator
@@ -85,7 +89,7 @@ namespace coscalc
     double calc_dl(double z)const;
     
   private:
-    double E(double z,double Omega_m,double Omega_l,double Omega_k)const;
+    double E(double z,double Omega_m,double Omega_l,double Omega_k,double Omega_rad,double w)const;
   };
 }
 
