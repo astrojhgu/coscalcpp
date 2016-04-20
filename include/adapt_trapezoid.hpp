@@ -18,9 +18,9 @@ class interval_sum
   T left_x;
   T ydx;
   bool to_be_refined;
-  T err;
-  interval_sum(T x1,T x2,bool x3)
-    :left_x(x1),ydx(x2),to_be_refined(x3)
+  T err_limit;
+  interval_sum(T x1,T x2,T el,bool x3)
+    :left_x(x1),ydx(x2),err_limit(el),to_be_refined(x3)
     {
     }
 };
@@ -41,8 +41,8 @@ T adapt_trapezoid(fT fun,
    */
   std::list<interval> interval_list;
   T current_sum=((fun(x1)+fun(x2))/(T)(2)*(x2-x1));
-  interval_list.push_back(interval(x1,current_sum,true));
-  interval_list.push_back(interval(x2,(T)0.,true));
+  interval_list.push_back(interval(x1,current_sum,err_limit,true));
+  interval_list.push_back(interval(x2,(T)0.,err_limit,true));
   bool int_state=1;
   size_t n_intervals=1;
   while(int_state)
@@ -58,21 +58,22 @@ T adapt_trapezoid(fT fun,
 	  //assert(i2->left_x>i1->left_x);
 	  if(i1->to_be_refined)
 	    {
-	      interval new_interval((i1->left_x+i2->left_x)/2,0,true);
+	      interval new_interval((i1->left_x+i2->left_x)/2,0,i1->err_limit/2,true);
 	      
 	      T sum1,sum2;
 	      sum1=(fun(new_interval.left_x)+fun(i1->left_x))/2*(new_interval.left_x-i1->left_x);
 	      sum2=(fun(new_interval.left_x)+fun(i2->left_x))/2*(i2->left_x-new_interval.left_x);
 	      new_interval.ydx=sum2;
 	      T err;
-	      err=i1->ydx-sum1-sum2;
-	      err/=(sum1+sum2);
+	      err=std::abs(i1->ydx-sum1-sum2);
+	      //err/=(sum1+sum2);
 	      
-	      err=err<0?-err:err;
+	      
 
-	      if(err>err_limit||n_intervals<10)
+	      if((err>i1->err_limit&&i1->err_limit>0)||n_intervals<10)
 		{
 		  i1->ydx=sum1;
+		  i1->err_limit/=2;
 		  interval_list.insert(i2,new_interval);
 		  n_intervals++;
 		  //cout<<n_intervals<<'\n';;
@@ -101,7 +102,7 @@ T adapt_trapezoid(fT fun,
     }
     );
 
-  result=std::accumulate(interval_list.begin(),interval_list.end(),interval(0,0,false),[](const interval& x1,const interval& x2){return interval(0,x1.ydx+x2.ydx,false);}).ydx;
+  result=std::accumulate(interval_list.begin(),interval_list.end(),interval(0,0,0,false),[](const interval& x1,const interval& x2){return interval(0,x1.ydx+x2.ydx,0,false);}).ydx;
   //std::cout<<interval_list.size()<<std::endl;
   return result;
 }

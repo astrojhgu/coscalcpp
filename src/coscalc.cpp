@@ -40,7 +40,7 @@ namespace coscalc
     double c      = this->cp.c;
     double H0     = this->cp.H0;
 
-    return c/H0*adapt_trapezoid([=](double z){return 1.0/E(z,Omega_m,Omega_l,Omega_k,Omega_rad,w);},0.,z,1e-4);
+    return c/H0*adapt_trapezoid([=](double z){return 1.0/E(z,Omega_m,Omega_l,Omega_k,Omega_rad,w);},0.,z,1e-10);
   }
 
   double cosmic_calculator::calc_dm(double z)const
@@ -53,7 +53,7 @@ namespace coscalc
       }
     else if(cp.Omega_k<0)
       {
-	return Dh/std::sqrt(-cp.Omega_k)*std::sin(std::sqrt(cp.Omega_k)*Dc/Dh);
+	return Dh/std::sqrt(-cp.Omega_k)*std::sin(std::sqrt(-cp.Omega_k)*Dc/Dh);
       }
     else
       {
